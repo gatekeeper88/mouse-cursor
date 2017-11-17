@@ -80,42 +80,62 @@ $( document ).ready(function() {
 		}
 	}
 
+	function showStats() {
+		rectangles.forEach(function(rect) {
+			var stats = updateStats(rect);
+			$("#li_" + rect.id).html(rect.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed + ' distance: ' + stats.distance )
+		});
+	}
+
 	drawRectangles();
+	showStats();
 
 	function getDistance(a, b) {
 		return Math.sqrt(Math.pow((a.x-b.x), 2) + Math.pow((a.y-b.y), 2));
 	} 
 
-	function calculateStats(rectangle, data) {
+	function updateStats(rectangle, data) {
+		var defaultStats = {
+			currSpeed: 0,
+			avgSpeed: 0,
+			distance: 0	
+		}
+
+		if (!data)
+			return defaultStats;
+
 		if (!statsCache[rectangle.id]) {
 			var initStats = { 
 				currSpeed: 0,
 				avgSpeed: 0, 
 				distance: 0,
 				pos: { 
-					x: data.x, 
-					y: data.y, 
+					x: data.x , 
+					y: data.y,
 					timestamp: new Date(data.timestamp)
 				} 
 			}
 			statsCache[rectangle.id] = initStats;
+
+			return initStats;
 		} else {
 			var stats = statsCache[rectangle.id];
 
 			var currTimestamp = new Date(data.timestamp);
-
+			// Calculate current speed
 			var prevPos = stats.pos;
 			var elapsedTime =  currTimestamp - prevPos.timestamp;
 			var currDistance = getDistance(data, prevPos);
 			stats.currSpeed = currDistance / elapsedTime;
 			
+			// Calculate average speed
 			stats.distance += currDistance;
 			var totalElapsedTime = currTimestamp - appStartTime;
 			stats.avgSpeed = stats.distance / totalElapsedTime;
 
 			statsCache[rectangle.id] = stats;
 
-			$("#li_" + rectangle.id).html('avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed + ' distance: ' + stats.distance )
+			return stats;
 		}
 	}
 
@@ -151,7 +171,9 @@ $( document ).ready(function() {
 
 		rectangles.forEach(function(rectangle) {
 			if (rectangle.contains(data.x, data.y)) {
-				calculateStats(rectangle, data);
+				var stats = updateStats(rectangle, data);
+
+				$("#li_" + rectangle.id).html(rectangle.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed + ' distance: ' + stats.distance )
 			}
 		});
 	});
