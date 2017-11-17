@@ -1,6 +1,4 @@
 $( document ).ready(function() {
-	console.log( "ready!" );
-
 	var mouseX, mouseY = 0;
 	var refreshRate = 100;
 	var $rectangle = $("#rectDiv")

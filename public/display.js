@@ -122,7 +122,7 @@ $( document ).ready(function() {
 			url : "output",
 			dataType: "text",
 			success : function (resBody) {
-				console.log('resBody', resBody)
+
 				if (!resBody) return;
 
 				var points = resBody.split(':');
@@ -143,7 +143,6 @@ $( document ).ready(function() {
 	});
 
 	socket.on('mouseMoved', function(data) {
-		console.log('data!!!')
 		drawTrail(data);
 
 		rectangles.forEach(function(rectangle) {
