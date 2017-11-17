@@ -64,19 +64,23 @@ $( document ).ready(function() {
 	var statsCache = {};
 	var MAX_RECTANGLES = 10;
 
-	for(var i=0; i<MAX_RECTANGLES; i++) {
+	function drawRectangles() {
+		for(var i=0; i<MAX_RECTANGLES; i++) {
 
-		var divWidth = ((Math.random()*100) + 50).toFixed();
-		var divHeight = divWidth / 2;
-		var posX = (Math.random() * ($rectangle.width() - divWidth)).toFixed();
-		var posY = (Math.random() * ($rectangle.height() - divHeight)).toFixed();
-		
-		var rectangle = new Rectangle(divWidth, divHeight, posX, posY)
-		rectangle.setId(i);
-		rectangle.draw();
+			var divWidth = ((Math.random()*100) + 50).toFixed();
+			var divHeight = divWidth / 2;
+			var posX = (Math.random() * ($rectangle.width() - divWidth)).toFixed();
+			var posY = (Math.random() * ($rectangle.height() - divHeight)).toFixed();
+			
+			var rectangle = new Rectangle(divWidth, divHeight, posX, posY)
+			rectangle.setId(i);
+			rectangle.draw();
 
-		rectangles.push(rectangle);
+			rectangles.push(rectangle);
+		}
 	}
+
+	drawRectangles();
 
 	function getDistance(a, b) {
 		return Math.sqrt(Math.pow((a.x-b.x), 2) + Math.pow((a.y-b.y), 2));
