@@ -1,0 +1,17 @@
+.smallbox {
+	width: 5px;
+	height: 5px;
+	background-color: red;
+}
+
+.box {
+	width: 500px;
+	height: 500px;
+	background-color: gray;
+	position: relative;
+}
+
+.stats {
+	position: absolute;
+	top: 530px;
+}
