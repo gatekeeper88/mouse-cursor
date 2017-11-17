@@ -20,19 +20,19 @@ var fileStream = fs.createWriteStream('./public/output');
 
 // On connection...
 io.on('connection', function(socket){
-	var clients = io.sockets.clients();
+    var clients = io.sockets.clients();
 
-	// listen for mouse updates from client
-	socket.on('mouse', function (data) {
-		// Write data to file
-		fileStream.write(data.x + ',' + data.y + ':');
-		// Broadcast to connected clients
-		socket.broadcast.emit('mouseMoved', data);
-	});
+    // listen for mouse updates from client
+    socket.on('mouse', function (data) {
+        // Write data to file
+        fileStream.write(data.x + ',' + data.y + ':');
+        // Broadcast to connected clients
+        socket.broadcast.emit('mouseMoved', data);
+    });
 
-	//On disconnect
-	socket.on('disconnect', function() {
-   		console.log('Got disconnected');
+    //On disconnect
+    socket.on('disconnect', function() {
+        console.log('Got disconnected');
    });
 });
 
