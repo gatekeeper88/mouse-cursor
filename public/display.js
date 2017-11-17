@@ -2,7 +2,8 @@ $( document ).ready(function() {
 	var socket = io();
 	var $rectangle = $("#rectDiv")
 	var rectBox = $rectangle.get(0).getBoundingClientRect();
-	var appStartTime = new Date();
+	var lastPosition;
+	
 
 	function getRandomColor() {
 		return '#'+ ('000000' + Math.floor(Math.random()*16777215).toString(16)).slice(-6);
@@ -83,7 +84,7 @@ $( document ).ready(function() {
 	function showStats() {
 		rectangles.forEach(function(rect) {
 			var stats = updateStats(rect);
-			$("#li_" + rect.id).html(rect.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed + ' distance: ' + stats.distance )
+			$("#li_" + rect.id).html(rect.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed )
 		});
 	}
 
@@ -94,26 +95,25 @@ $( document ).ready(function() {
 		return Math.sqrt(Math.pow((a.x-b.x), 2) + Math.pow((a.y-b.y), 2));
 	} 
 
-	function updateStats(rectangle, data) {
+	function updateStats(rectangle, position) {
 		var defaultStats = {
 			currSpeed: 0,
 			avgSpeed: 0,
-			distance: 0	
+			distance: 0,
+			speed: 0	
 		}
 
-		if (!data)
+		if (!position)
 			return defaultStats;
 
 		if (!statsCache[rectangle.id]) {
+			
 			var initStats = { 
 				currSpeed: 0,
 				avgSpeed: 0, 
 				distance: 0,
-				pos: { 
-					x: data.x , 
-					y: data.y,
-					timestamp: new Date(data.timestamp)
-				} 
+				sumSpeed: 0,
+				count: 0
 			}
 			statsCache[rectangle.id] = initStats;
 
@@ -121,17 +121,24 @@ $( document ).ready(function() {
 		} else {
 			var stats = statsCache[rectangle.id];
 
-			var currTimestamp = new Date(data.timestamp);
+			var currTimestamp = new Date(position.timestamp);
+			var lastTimestamp = new Date(lastPosition.timestamp);
+
+
 			// Calculate current speed
-			var prevPos = stats.pos;
-			var elapsedTime =  currTimestamp - prevPos.timestamp;
-			var currDistance = getDistance(data, prevPos);
-			stats.currSpeed = currDistance / elapsedTime;
-			
+			var elapsedTime =  currTimestamp - lastTimestamp;
+
+			var currDistance = getDistance(position, lastPosition);
+			var currSpeed = currDistance / elapsedTime;
+			stats.currSpeed = currSpeed;
+
+			stats.count = stats.count + 1;
+			stats.sumSpeed += currSpeed;
+
 			// Calculate average speed
-			stats.distance += currDistance;
-			var totalElapsedTime = currTimestamp - appStartTime;
-			stats.avgSpeed = stats.distance / totalElapsedTime;
+			if ( stats.count > 0 ) {
+				stats.avgSpeed = stats.sumSpeed / stats.count;
+			}
 
 			statsCache[rectangle.id] = stats;
 
@@ -166,15 +173,20 @@ $( document ).ready(function() {
 		});
 	});
 
-	socket.on('mouseMoved', function(data) {
-		drawTrail(data);
+	socket.on('mouseMoved', function(position) {
+		drawTrail(position);
+			if (!lastPosition) {
+				lastPosition = position;
 
-		rectangles.forEach(function(rectangle) {
-			if (rectangle.contains(data.x, data.y)) {
-				var stats = updateStats(rectangle, data);
-
-				$("#li_" + rectangle.id).html(rectangle.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed + ' distance: ' + stats.distance )
+				return;
 			}
-		});
+
+			rectangles.forEach(function(rectangle) {
+				if (rectangle.contains(position.x, position.y)) {
+					var stats = updateStats(rectangle, position);
+
+					$("#li_" + rectangle.id).html(rectangle.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed )
+				}	
+			});
 	});
 });
