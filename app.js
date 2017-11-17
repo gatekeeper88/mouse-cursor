@@ -31,7 +31,7 @@ io.on('connection', function(socket){
 	// listen for mouse updates from client
 	socket.on('mouse', function (data) {
 		// Write data to file
-		fileStream.write(data.x + ',' + data.y + ':');
+		fileStream.write(data.x + ',' + data.y + ',' + new Date(data.timestamp).getTime() + ':');
 		// Broadcast to connected clients
 		socket.broadcast.emit('mouseMoved', data);
 	});
