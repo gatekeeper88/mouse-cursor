@@ -96,23 +96,18 @@ $( document ).ready(function() {
 	} 
 
 	function updateStats(rectangle, position) {
-		var defaultStats = {
+		var initStats = {
 			currSpeed: 0,
 			avgSpeed: 0,
-			speed: 0	
+			sumSpeed: 0,
+			speedCount: 0
 		}
 
 		if (!position)
-			return defaultStats;
+			return initStats;
 
 		if (!statsCache[rectangle.id]) {
 			
-			var initStats = { 
-				currSpeed: 0,
-				avgSpeed: 0, 
-				sumSpeed: 0,
-				count: 0
-			}
 			statsCache[rectangle.id] = initStats;
 
 			return initStats;
@@ -130,12 +125,12 @@ $( document ).ready(function() {
 			var currSpeed = currDistance / elapsedTime;
 			stats.currSpeed = currSpeed;
 
-			stats.count = stats.count + 1;
+			stats.speedCount = stats.speedCount + 1;
 			stats.sumSpeed += currSpeed;
 
 			// Calculate average speed
-			if ( stats.count > 0 ) {
-				stats.avgSpeed = stats.sumSpeed / stats.count;
+			if ( stats.speedCount > 0 ) {
+				stats.avgSpeed = stats.sumSpeed / stats.speedCount;
 			}
 
 			statsCache[rectangle.id] = stats;
