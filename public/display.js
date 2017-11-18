@@ -111,7 +111,6 @@ $( document ).ready(function() {
 			var initStats = { 
 				currSpeed: 0,
 				avgSpeed: 0, 
-				distance: 0,
 				sumSpeed: 0,
 				count: 0
 			}
@@ -188,5 +187,7 @@ $( document ).ready(function() {
 					$("#li_" + rectangle.id).html(rectangle.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed )
 				}	
 			});
+
+			lastPosition = position;
 	});
 });
