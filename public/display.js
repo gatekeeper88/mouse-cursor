@@ -99,7 +99,6 @@ $( document ).ready(function() {
 		var defaultStats = {
 			currSpeed: 0,
 			avgSpeed: 0,
-			distance: 0,
 			speed: 0	
 		}
 
