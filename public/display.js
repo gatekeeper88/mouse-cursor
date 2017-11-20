@@ -10,10 +10,10 @@ $( document ).ready(function() {
 	}
 
 	function Rectangle (w, h, x, y) {
-		this.x = x;
-		this.y = y;
-		this.width = w;
-		this.height = h;
+		this.x = Number(x);
+		this.y = Number(y);
+		this.width = Number(w);
+		this.height = Number(h);
 
 		this.setId = function(id) {
 			this.id = id;
@@ -22,7 +22,7 @@ $( document ).ready(function() {
 		this.contains = function (x, y) {
 			return this.x <= x && x <= this.x + this.width &&
 				   this.y <= y && y <= this.y + this.height;
-		}
+		}		
 
 		this.draw = function () {
 			var color = getRandomColor();
@@ -83,7 +83,7 @@ $( document ).ready(function() {
 
 	function showStats() {
 		rectangles.forEach(function(rect) {
-			var stats = updateStats(rect);
+			var stats = updateSpeedStats(rect);
 			$("#li_" + rect.id).html(rect.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed )
 		});
 	}
@@ -95,7 +95,7 @@ $( document ).ready(function() {
 		return Math.sqrt(Math.pow((a.x-b.x), 2) + Math.pow((a.y-b.y), 2));
 	} 
 
-	function updateStats(rectangle, position) {
+	function updateSpeedStats(rectangle, position) {
 		var initStats = {
 			currSpeed: 0,
 			avgSpeed: 0,
@@ -119,14 +119,18 @@ $( document ).ready(function() {
 
 
 			// Calculate current speed
-			var elapsedTime =  currTimestamp - lastTimestamp;
+			var elapsedTime =  (currTimestamp - lastTimestamp) / 1000;
 
 			var currDistance = getDistance(position, lastPosition);
+
 			var currSpeed = currDistance / elapsedTime;
 			stats.currSpeed = currSpeed;
 
-			stats.speedCount = stats.speedCount + 1;
-			stats.sumSpeed += currSpeed;
+
+			if ( currSpeed > 0 ) {
+				stats.speedCount = stats.speedCount + 1;
+				stats.sumSpeed += currSpeed;
+			}
 
 			// Calculate average speed
 			if ( stats.speedCount > 0 ) {
@@ -137,6 +141,10 @@ $( document ).ready(function() {
 
 			return stats;
 		}
+	}
+
+	function getSpeedStats(id) {
+		return statsCache[id];
 	}
 
 	$("#replay").click(function(e) {
@@ -176,10 +184,21 @@ $( document ).ready(function() {
 
 			rectangles.forEach(function(rectangle) {
 				if (rectangle.contains(position.x, position.y)) {
-					var stats = updateStats(rectangle, position);
+
+					var stats = updateSpeedStats(rectangle, position);
+					var currSpeed = stats.currSpeed;
+					var avgSpeed = stats.avgSpeed;
 
 					$("#li_" + rectangle.id).html(rectangle.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + stats.currSpeed )
-				}	
+				} else {
+					var stats = getSpeedStats(rectangle.id);
+					
+					if (!stats) return;
+
+					var avgSpeed = stats.avgSpeed;
+					var currSpeed = 0;
+					$("#li_" + rectangle.id).html(rectangle.id + ' avg speed: ' + stats.avgSpeed + 'curr speed: ' + currSpeed )
+				}
 			});
 
 			lastPosition = position;
